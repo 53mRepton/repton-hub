@@ -3,206 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repton Pro Hub</title>
+    <title>Repton Pro Hub - Shared</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --glass: rgba(255, 255, 255, 0.1); --accent: #ffcc00; --navy: #1d427b; --warn: #ff4444; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #0a192f; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; overflow-x: hidden; }
-
-        /* Battery Alert Banner */
-        #low-bat-alert { display: none; width: 100%; max-width: 380px; background: var(--warn); color: white; text-align: center; padding: 8px; border-radius: 12px; font-size: 11px; font-weight: 900; margin-bottom: 10px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        .card { background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 28px; padding: 22px; width: 100%; max-width: 380px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.3); position: relative; margin-top: 5px; }
-        .lesson-text { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-        .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
-        .p-bar { height: 100%; width: 0%; background: var(--accent); transition: width 0.5s ease-in-out; }
-
-        .weather-row { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .temp-val { font-size: 42px; font-weight: 200; display: flex; align-items: center; }
-        .forecast-panel { display: none; flex-direction: column; gap: 15px; margin-top: 15px; width: 100%; max-width: 380px; background: rgba(0,0,0,0.2); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .scroll-x { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scrollbar-width: none; }
-        .hour-box { text-align: center; min-width: 55px; flex-shrink: 0; }
-        .w-icon { width: 45px; height: 45px; vertical-align: middle; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #0a192f; color: white; display: flex; flex-direction: column; align-items: center; padding: 15px; }
+        
+        /* Shared CSS from previous versions... */
+        #login-screen { position: fixed; inset: 0; background: #0a192f; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--glass); backdrop-filter: blur(20px); padding: 40px; border-radius: 30px; text-align: center; width: 350px; border: 1px solid rgba(255,255,255,0.1); }
+        .pin-input { background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; color: white; font-size: 24px; text-align: center; width: 100%; margin: 20px 0; }
+        
+        .card { background: var(--glass); backdrop-filter: blur(25px); border-radius: 28px; padding: 22px; width: 100%; max-width: 380px; border: 1px solid rgba(255,255,255,0.15); margin-top: 10px; }
         .main-btn { width: 100%; max-width: 380px; padding: 16px; border-radius: 20px; border: none; background: white; color: var(--navy); font-weight: 800; cursor: pointer; margin-top: 12px; }
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; z-index: 100; padding: 20px; align-items: center; justify-content: center; }
-        .modal-box { background: #111; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; border: 1px solid #333; max-height: 90vh; overflow-y: auto; }
-        input { background: transparent; border: 1px solid transparent; color: white; padding: 8px; width: 100%; border-radius: 8px; }
-        .locked input { pointer-events: none; opacity: 0.7; }
-        .edit-on input { background: rgba(255,204,0,0.05); border-color: var(--accent); pointer-events: auto; }
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; }
-        .tab { flex: 1; padding: 8px; border-radius: 8px; border: none; background: #222; color: #777; font-weight: 700; cursor: pointer; min-width: 60px; }
-        .tab.active { background: var(--accent); color: var(--navy); }
-        .live-clock { font-size: 12px; font-weight: 700; opacity: 0.5; letter-spacing: 1px; }
+        .modal-box { background: #111; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; border: 1px solid #333; }
+        input { background: #222; border: 1px solid #444; color: white; padding: 8px; border-radius: 8px; width: 100%; }
+        .p-bar { height: 6px; width: 0%; background: var(--accent); border-radius: 10px; transition: 0.5s; }
     </style>
 </head>
 <body>
 
-    <div id="low-bat-alert">⚠️ LOW BATTERY: PLEASE PLUG IN CHARGER</div>
-
-    <div style="width: 100%; max-width: 380px; margin: 10px 0; display: flex; justify-content: space-between; align-items: flex-end;">
-        <div>
-            <div class="live-clock" id="clock">00:00:00</div>
-            <h1 id="greet" style="font-size: 24px;">Hello!</h1>
-        </div>
-        <div id="bat-stat" style="font-size: 11px; font-weight: 800; opacity: 0.5; text-align: right; margin-bottom: 5px;">
-            <span id="bat-level">--%</span> <span id="bat-icon">🔋</span>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color:var(--accent)">REPTON HUB</h2>
+            <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••">
+            <button class="main-btn" onclick="checkPin()">UNLOCK HUB</button>
         </div>
     </div>
 
-    <div class="card">
-        <span style="position:absolute; top:20px; right:20px; opacity:0.3; cursor:pointer;" onclick="openPop('setM')">⚙️</span>
-        <div id="count" style="font-size:10px; font-weight:800; color:var(--accent); letter-spacing:1px; margin-bottom:5px;">--</div>
-        <div id="status" class="lesson-text">Scanning...</div>
-        <div class="progress-track"><div id="bar" class="p-bar"></div></div>
+    <div id="hub-content" style="display:none; width: 100%; max-width: 380px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1 id="greet">Hello</h1>
+            <span id="bat-stat" style="font-size: 12px; opacity:0.5;">--% 🔋</span>
+        </div>
 
-        <div class="weather-row" onclick="toggleForecast()" style="cursor:pointer">
-            <div>
-                <div class="temp-val"><img id="curIcon" src="" class="w-icon" style="margin-left:-10px"><span id="wT">--°</span></div>
-                <div id="wD" style="font-size: 12px; font-weight: 700; color: var(--accent); text-transform:uppercase;">Connect...</div>
+        <div class="card">
+            <div id="status" style="font-size: 22px; font-weight: 800;">Loading Hub...</div>
+            <div style="background:rgba(255,255,255,0.1); height:6px; border-radius:10px; margin: 15px 0;">
+                <div id="bar" class="p-bar"></div>
             </div>
-            <div style="text-align: right; font-size: 11px; opacity: 0.6;">
-                Feels Like <span id="wF">--</span>°<br>Wind <span id="wW">--</span> km/h
-            </div>
+            <div id="weather" style="opacity:0.8">Dubai: --°C</div>
         </div>
-    </div>
 
-    <div id="forecastPanel" class="forecast-panel">
-        <div class="scroll-x" id="hourlyBox"></div>
-        <div id="dailyBox"></div>
+        <button class="main-btn" onclick="openPop('ttM')">VIEW SHARED TIMETABLE</button>
+        <button class="main-btn" style="background:transparent; color:white; border:1px solid rgba(255,255,255,0.2)" onclick="logout()">LOGOUT</button>
     </div>
-
-    <button class="main-btn" onclick="openPop('ttM')">🎒 VIEW TIMETABLE</button>
 
     <div id="ttM" class="modal" onclick="if(event.target==this)this.style.display='none'">
         <div class="modal-box">
-            <div class="tabs" id="tabs"></div>
-            <table style="width:100%"><tbody id="ttB"></tbody></table>
-            <div style="margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-                <label style="font-size:10px; color:var(--accent); font-weight:800;">TODAY'S LUNCH</label>
-                <input id="lunchI" placeholder="Type menu..." oninput="saveL(this.value)" style="background:#222; margin-top:5px;">
-            </div>
+            <h3 style="margin-bottom:15px">Global Timetable</h3>
+            <div id="ttList" style="max-height: 300px; overflow-y: auto;"></div>
+            <button class="main-btn" onclick="saveGlobalData()">SAVE FOR EVERYONE</button>
             <button class="main-btn" style="background:#333; color:white;" onclick="closePop('ttM')">Close</button>
         </div>
     </div>
 
-    <div id="setM" class="modal" onclick="if(event.target==this)this.style.display='none'">
-        <div class="modal-box" style="text-align:center">
-            <h3>Hub Settings</h3>
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:15px; border-radius:15px; margin:20px 0;">
-                <span>Master Edit Mode</span>
-                <input type="checkbox" id="eCheck" onchange="isEd=this.checked;renderTT()" style="width:25px; height:25px">
-            </div>
-            <button class="main-btn" onclick="closePop('setM')">Done</button>
-        </div>
-    </div>
-
     <script>
-        let times = JSON.parse(localStorage.getItem('rT')) || [["08:00","09:00"],["09:00","10:00"],["10:00","10:20"],["10:20","11:20"],["11:20","12:20"],["12:20","13:00"],["13:00","14:00"],["14:00","15:00"],["15:00","16:00"]];
-        let subs = JSON.parse(localStorage.getItem('rS')) || {Mon:Array(9).fill("Subject"), Tue:Array(9).fill("Subject"), Wed:Array(9).fill("Subject"), Thu:Array(9).fill("Subject"), Fri:Array(9).fill("Subject")};
-        let lunch = JSON.parse(localStorage.getItem('rL')) || {Mon:"",Tue:"",Wed:"",Thu:"",Fri:""};
-        let curD = new Date().toLocaleDateString('en-US',{weekday:'short'});
-        if(!subs[curD]) curD = 'Mon';
-        let isEd = false;
+        // --- CONFIGURATION ---
+        const SB_URL = "https://dcmyqxrxwkhdikgwgqzv.supabase.co";
+        const SB_KEY = "sb_publishable_Q6z4YJIMySzvu1yNVBiiXA_OgyUwAWG";
+        const supabase = lib.supabase.createClient(SB_URL, SB_KEY);
 
-        // Enhanced Battery Logic
-        async function updateBattery() {
-            if (!navigator.getBattery) return;
-            const bat = await navigator.getBattery();
-            const update = () => {
-                const level = Math.round(bat.level * 100);
-                const isLow = level <= 20 && !bat.charging;
-                
-                document.getElementById('bat-level').innerText = level + "%";
-                document.getElementById('bat-icon').innerText = bat.charging ? "⚡" : (level < 20 ? "🪫" : "🔋");
-                
-                // Low Battery Styling
-                const statEl = document.getElementById('bat-stat');
-                const alertEl = document.getElementById('low-bat-alert');
-                
-                if (isLow) {
-                    statEl.style.color = "#ff4444";
-                    statEl.style.opacity = "1";
-                    alertEl.style.display = "block";
-                } else {
-                    statEl.style.color = "inherit";
-                    statEl.style.opacity = "0.5";
-                    alertEl.style.display = "none";
-                }
-            };
-            update();
-            bat.addEventListener('levelchange', update);
-            bat.addEventListener('chargingchange', update);
+        let globalStore = { pin: "1234", timetable: [], lunch: {} };
+
+        // 1. Fetch Shared Data from Cloud
+        async function loadCloudData() {
+            const { data, error } = await supabase.from('hub_data').select('content').eq('id', 'main_config').single();
+            if (data) globalStore = data.content;
         }
 
-        function getOWMIcon(code, isNight = false) {
-            const map = { 0:"01", 1:"01", 2:"02", 3:"03", 45:"50", 48:"50", 51:"09", 61:"10", 71:"13", 95:"11" };
-            return `https://openweathermap.org/img/wn/${map[code] || "03"}${isNight ? 'n' : 'd'}@2x.png`;
+        // 2. Save Shared Data to Cloud
+        async function saveGlobalData() {
+            // Collect data from inputs (Simplified for example)
+            const { error } = await supabase.from('hub_data').update({ content: globalStore }).eq('id', 'main_config');
+            if (!error) alert("Saved for all users!");
         }
 
-        async function getW() {
-            try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=25.1453&longitude=55.3790&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`);
-                const d = await res.json();
-                const nowHr = new Date().getHours();
-                document.getElementById('wT').innerText = Math.round(d.current.temperature_2m)+"°";
-                document.getElementById('wF').innerText = Math.round(d.current.apparent_temperature);
-                document.getElementById('wW').innerText = Math.round(d.current.wind_speed_10m);
-                document.getElementById('curIcon').src = getOWMIcon(d.current.weather_code, nowHr > 18 || nowHr < 6);
-                document.getElementById('wD').innerText = "Update: OK";
-
-                const hBox = document.getElementById('hourlyBox'); hBox.innerHTML = '';
-                for(let i = 0; i < 24; i++) {
-                    const idx = nowHr + i;
-                    if(!d.hourly.time[idx]) break;
-                    hBox.innerHTML += `<div class="hour-box"><div style="font-size:10px">${i===0?'Now':new Date(d.hourly.time[idx]).getHours()+':00'}</div><img src="${getOWMIcon(d.hourly.weather_code[idx])}" class="w-icon"><div>${Math.round(d.hourly.temperature_2m[idx])}°</div></div>`;
-                }
-            } catch(e) { console.error(e); }
-        }
-
-        const openPop = (id) => { document.getElementById(id).style.display='flex'; if(id=='ttM') renderTT(); };
-        const closePop = (id) => document.getElementById(id).style.display='none';
-        const toggleForecast = () => { const p = document.getElementById('forecastPanel'); p.style.display = p.style.display==='flex'?'none':'flex'; };
-        const saveT = (r,c,v) => { times[r][c]=v; localStorage.setItem('rT', JSON.stringify(times)); };
-        const saveS = (r,v) => { subs[curD][r]=v; localStorage.setItem('rS', JSON.stringify(subs)); };
-        const saveL = (v) => { lunch[curD]=v; localStorage.setItem('rL', JSON.stringify(lunch)); };
-
-        function renderTT() {
-            const t = document.getElementById('tabs'); t.innerHTML = '';
-            ['Mon','Tue','Wed','Thu','Fri'].forEach(d => t.innerHTML += `<button class="tab ${d==curD?'active':''}" onclick="curD='${d}';renderTT()">${d}</button>`);
-            const b = document.getElementById('ttB'); b.innerHTML = '';
-            b.className = isEd ? "edit-on" : "locked";
-            times.forEach((tm, i) => b.innerHTML += `<tr><td><input value="${tm[0]}" oninput="saveT(${i},0,this.value)" ${isEd?'':'readonly'}></td><td><input value="${tm[1]}" oninput="saveT(${i},1,this.value)" ${isEd?'':'readonly'}></td><td><input value="${subs[curD][i]}" oninput="saveS(${i},this.value)" ${isEd?'':'readonly'}></td></tr>`);
-            document.getElementById('lunchI').value = lunch[curD] || "";
-        }
-
-        function tick() {
-            const now = new Date();
-            const mins = now.getHours() * 60 + now.getMinutes();
-            const day = now.toLocaleDateString('en-US',{weekday:'short'});
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
-            document.getElementById('greet').innerText = now.getHours() < 12 ? "Good Morning!" : now.getHours() < 17 ? "Good Afternoon!" : "Good Evening!";
-            
-            let active = false;
-            if(subs[day]) {
-                const end = times[times.length-1][1];
-                const endM = parseInt(end.split(':')[0])*60 + parseInt(end.split(':')[1]);
-                document.getElementById('count').innerText = mins < endM ? `${endM - mins} MINS UNTIL HOME TIME 🏠` : "SCHOOL'S FINISHED";
-                times.forEach((t, i) => {
-                    const st = parseInt(t[0].split(':')[0])*60 + parseInt(t[0].split(':')[1]);
-                    const en = parseInt(t[1].split(':')[0])*60 + parseInt(t[1].split(':')[1]);
-                    if(mins >= st && mins < en) {
-                        document.getElementById('status').innerText = `Now: ${subs[day][i]}`;
-                        document.getElementById('bar').style.width = ((mins - st) / (en - st) * 100) + "%";
-                        active = true;
-                    }
-                });
+        function checkPin() {
+            const val = document.getElementById('pinInput').value;
+            if(val === globalStore.pin) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('hub-content').style.display = 'block';
+                startHub();
+            } else {
+                alert("Wrong PIN");
             }
-            if(!active) { document.getElementById('status').innerText = "School's Out ✨"; document.getElementById('bar').style.width = "0%"; }
         }
 
-        getW(); updateBattery(); setInterval(tick, 1000); tick();
+        function logout() { location.reload(); }
+        const openPop = (id) => document.getElementById(id).style.display='flex';
+        const closePop = (id) => document.getElementById(id).style.display='none';
+
+        function startHub() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('greet').innerText = now.getHours() < 12 ? "Good Morning!" : "Good Day!";
+            }, 1000);
+        }
+
+        // Initialize
+        loadCloudData();
     </script>
 </body>
 </html>
