@@ -3,108 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repton Pro Hub - Shared</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Repton Student Hub</title>
     <style>
-        :root { --glass: rgba(255, 255, 255, 0.1); --accent: #ffcc00; --navy: #1d427b; --warn: #ff4444; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #0a192f; color: white; display: flex; flex-direction: column; align-items: center; padding: 15px; }
+        :root { --glass: rgba(255, 255, 255, 0.1); --accent: #ffcc00; --navy: #0a192f; --warn: #ff4444; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--navy); color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; overflow-x: hidden; }
+
+        /* Login/Name Overlay */
+        #login-overlay { position: fixed; inset: 0; background: var(--navy); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-box { background: var(--glass); backdrop-filter: blur(20px); padding: 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); text-align: center; width: 100%; max-width: 350px; }
         
-        /* Shared CSS from previous versions... */
-        #login-screen { position: fixed; inset: 0; background: #0a192f; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--glass); backdrop-filter: blur(20px); padding: 40px; border-radius: 30px; text-align: center; width: 350px; border: 1px solid rgba(255,255,255,0.1); }
-        .pin-input { background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; color: white; font-size: 24px; text-align: center; width: 100%; margin: 20px 0; }
+        /* Dashboard Container */
+        #dashboard { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.8s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* UI Components */
+        .card { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 22px; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 15px; position: relative; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; text-align: center; font-size: 16px; }
+        .btn { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; background: var(--accent); color: var(--navy); transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
         
-        .card { background: var(--glass); backdrop-filter: blur(25px); border-radius: 28px; padding: 22px; width: 100%; max-width: 380px; border: 1px solid rgba(255,255,255,0.15); margin-top: 10px; }
-        .main-btn { width: 100%; max-width: 380px; padding: 16px; border-radius: 20px; border: none; background: white; color: var(--navy); font-weight: 800; cursor: pointer; margin-top: 12px; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; z-index: 100; padding: 20px; align-items: center; justify-content: center; }
-        .modal-box { background: #111; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; border: 1px solid #333; }
-        input { background: #222; border: 1px solid #444; color: white; padding: 8px; border-radius: 8px; width: 100%; }
-        .p-bar { height: 6px; width: 0%; background: var(--accent); border-radius: 10px; transition: 0.5s; }
+        .status-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 900; opacity: 0.5; margin-bottom: 8px; letter-spacing: 1px; }
+        .progress-track { background: rgba(255,255,255,0.1); height: 8px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--accent); width: 0%; transition: 0.5s ease-in-out; }
+        
+        #low-bat-banner { display: none; background: var(--warn); color: white; width: 100%; padding: 8px; text-align: center; font-size: 11px; font-weight: 900; border-radius: 10px; margin-bottom: 10px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
+    <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:var(--accent)">REPTON HUB</h2>
-            <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••">
-            <button class="main-btn" onclick="checkPin()">UNLOCK HUB</button>
+            <h1 style="color: var(--accent); margin-bottom: 5px;">REPTON HUB</h1>
+            <p style="opacity: 0.6; font-size: 13px;">Please enter your name to begin</p>
+            <input type="text" id="userNameInput" placeholder="Your Name" autocomplete="off">
+            <button class="btn" onclick="saveName()">ENTER HUB</button>
         </div>
     </div>
 
-    <div id="hub-content" style="display:none; width: 100%; max-width: 380px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1 id="greet">Hello</h1>
-            <span id="bat-stat" style="font-size: 12px; opacity:0.5;">--% 🔋</span>
+    <div id="dashboard">
+        <div id="low-bat-banner">⚠️ LOW BATTERY - PLUG IN CHARGER</div>
+
+        <div class="status-row">
+            <span id="live-clock">00:00:00</span>
+            <span id="bat-display">--% 🔋</span>
         </div>
 
         <div class="card">
-            <div id="status" style="font-size: 22px; font-weight: 800;">Loading Hub...</div>
-            <div style="background:rgba(255,255,255,0.1); height:6px; border-radius:10px; margin: 15px 0;">
-                <div id="bar" class="p-bar"></div>
-            </div>
-            <div id="weather" style="opacity:0.8">Dubai: --°C</div>
+            <h1 id="greeting">Hello!</h1>
+            <div id="current-lesson" style="font-size: 24px; font-weight: 800; margin-top: 5px;">Scanning Schedule...</div>
+            <div class="progress-track"><div id="bar-fill" class="progress-bar"></div></div>
+            <div id="weather-info" style="font-size: 14px; opacity: 0.7;">Dubai: --°</div>
         </div>
 
-        <button class="main-btn" onclick="openPop('ttM')">VIEW SHARED TIMETABLE</button>
-        <button class="main-btn" style="background:transparent; color:white; border:1px solid rgba(255,255,255,0.2)" onclick="logout()">LOGOUT</button>
-    </div>
-
-    <div id="ttM" class="modal" onclick="if(event.target==this)this.style.display='none'">
-        <div class="modal-box">
-            <h3 style="margin-bottom:15px">Global Timetable</h3>
-            <div id="ttList" style="max-height: 300px; overflow-y: auto;"></div>
-            <button class="main-btn" onclick="saveGlobalData()">SAVE FOR EVERYONE</button>
-            <button class="main-btn" style="background:#333; color:white;" onclick="closePop('ttM')">Close</button>
-        </div>
+        <button class="btn" onclick="openTimetable()">🎒 VIEW MY TIMETABLE</button>
+        <button class="btn" style="background: transparent; color: var(--warn); margin-top: 20px; font-size: 12px;" onclick="resetName()">Switch User / Logout</button>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const SB_URL = "https://dcmyqxrxwkhdikgwgqzv.supabase.co";
-        const SB_KEY = "sb_publishable_Q6z4YJIMySzvu1yNVBiiXA_OgyUwAWG";
-        const supabase = lib.supabase.createClient(SB_URL, SB_KEY);
-
-        let globalStore = { pin: "1234", timetable: [], lunch: {} };
-
-        // 1. Fetch Shared Data from Cloud
-        async function loadCloudData() {
-            const { data, error } = await supabase.from('hub_data').select('content').eq('id', 'main_config').single();
-            if (data) globalStore = data.content;
-        }
-
-        // 2. Save Shared Data to Cloud
-        async function saveGlobalData() {
-            // Collect data from inputs (Simplified for example)
-            const { error } = await supabase.from('hub_data').update({ content: globalStore }).eq('id', 'main_config');
-            if (!error) alert("Saved for all users!");
-        }
-
-        function checkPin() {
-            const val = document.getElementById('pinInput').value;
-            if(val === globalStore.pin) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('hub-content').style.display = 'block';
-                startHub();
+        // --- NAME LOGIC ---
+        function saveName() {
+            const name = document.getElementById('userNameInput').value;
+            if (name.trim() !== "") {
+                localStorage.setItem('repton_user', name);
+                initDashboard();
             } else {
-                alert("Wrong PIN");
+                alert("Please enter a name.");
             }
         }
 
-        function logout() { location.reload(); }
-        const openPop = (id) => document.getElementById(id).style.display='flex';
-        const closePop = (id) => document.getElementById(id).style.display='none';
-
-        function startHub() {
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('greet').innerText = now.getHours() < 12 ? "Good Morning!" : "Good Day!";
-            }, 1000);
+        function resetName() {
+            localStorage.removeItem('repton_user');
+            location.reload();
         }
 
-        // Initialize
-        loadCloudData();
+        function initDashboard() {
+            const savedName = localStorage.getItem('repton_user');
+            if (savedName) {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('greeting').innerText = `Hello, ${savedName}!`;
+                startSystems();
+            }
+        }
+
+        // --- SYSTEMS (BATTERY, WEATHER, CLOCK) ---
+        async function startSystems() {
+            // Clock & Greeting Time
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('live-clock').innerText = now.toLocaleTimeString();
+                const hrs = now.getHours();
+                let timeGreet = hrs < 12 ? "Good Morning" : hrs < 17 ? "Good Afternoon" : "Good Evening";
+                document.getElementById('greeting').innerText = `${timeGreet}, ${localStorage.getItem('repton_user')}!`;
+            }, 1000);
+
+            // Battery
+            if (navigator.getBattery) {
+                const bat = await navigator.getBattery();
+                const updateBat = () => {
+                    const level = Math.round(bat.level * 100);
+                    document.getElementById('bat-display').innerText = `${level}% ${bat.charging ? '⚡' : '🔋'}`;
+                    document.getElementById('low-bat-banner').style.display = (level < 20 && !bat.charging) ? 'block' : 'none';
+                };
+                updateBat();
+                bat.onlevelchange = updateBat;
+                bat.onchargingchange = updateBat;
+            }
+
+            // Weather (Dubai)
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.14&longitude=55.37&current=temperature_2m');
+                const data = await res.json();
+                document.getElementById('weather-info').innerText = `Dubai: ${Math.round(data.current.temperature_2m)}°C`;
+            } catch (e) { console.log("Weather error"); }
+        }
+
+        function openTimetable() {
+            alert("This will open your personal timetable!");
+        }
+
+        // Check if user already logged in on load
+        window.onload = initDashboard;
     </script>
 </body>
 </html>
