@@ -6,46 +6,54 @@
     <title>Repton Pro Hub</title>
     <style>
         :root { --glass: rgba(255, 255, 255, 0.1); --accent: #ffcc00; --navy: #0a192f; --warn: #ff4444; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         body { background: var(--navy); color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; }
 
         /* Login Screen */
         #login-screen { position: fixed; inset: 0; background: var(--navy); z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--glass); backdrop-filter: blur(20px); padding: 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); text-align: center; width: 350px; }
-
-        /* Hub Layout */
-        #hub-ui { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .card { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 15px; }
-        .status-bar { display: flex; justify-content: space-between; font-size: 11px; font-weight: 900; opacity: 0.6; margin-bottom: 10px; }
         
-        /* Timetable Table */
+        /* Dashboard Layout */
+        #hub-ui { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 25px; padding: 22px; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 15px; position: relative; }
+        
+        /* Status Bar */
+        .status-bar { display: flex; justify-content: space-between; font-size: 11px; font-weight: 900; opacity: 0.6; margin-bottom: 8px; letter-spacing: 1px; }
+        #low-bat { display: none; background: var(--warn); color: white; padding: 8px; text-align: center; font-size: 11px; font-weight: 900; border-radius: 12px; margin-bottom: 10px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        /* Progress Bar */
+        .progress-track { background: rgba(255,255,255,0.1); height: 8px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.5s ease-in-out; }
+
+        /* Timetable */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        td { padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        input.tt-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; outline: none; }
-        input.tt-input:focus { color: var(--accent); }
-        .editing input.tt-input { background: rgba(255,255,255,0.05); border-radius: 4px; padding: 4px; }
+        td { padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        .tt-input { background: transparent; border: none; color: white; width: 100%; outline: none; transition: 0.3s; }
+        .editing .tt-input { background: rgba(255,255,255,0.08); padding: 5px; border-radius: 5px; color: var(--accent); }
 
         /* Buttons */
-        .btn { width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; background: var(--accent); color: var(--navy); margin-top: 10px; }
-        .btn-save { background: #2ecc71; color: white; display: none; }
-        
-        #low-bat { display: none; background: var(--warn); color: white; padding: 8px; text-align: center; font-size: 11px; font-weight: 900; border-radius: 10px; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 16px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--accent); color: var(--navy); }
+        .btn-save { background: #2ecc71; color: white; margin-top: 10px; display: none; }
+        .btn:active { transform: scale(0.97); }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h1 style="color: var(--accent)">REPTON HUB</h1>
-            <input type="text" id="nameIn" placeholder="Enter Your Name" style="width:100%; padding:12px; margin:20px 0; border-radius:10px; border:none; text-align:center;">
-            <button class="btn" onclick="login()">START SESSION</button>
+            <h1 style="color: var(--accent); letter-spacing: 2px;">REPTON PRO</h1>
+            <p style="opacity: 0.5; font-size: 12px; margin-top: 5px;">STUDENT DASHBOARD</p>
+            <input type="text" id="nameInput" placeholder="Enter Your Name" style="width:100%; padding:15px; margin:25px 0; border-radius:12px; border:none; text-align:center; font-size:16px;">
+            <button class="btn btn-primary" onclick="login()">ENTER HUB</button>
         </div>
     </div>
 
     <div id="hub-ui">
-        <div id="low-bat">⚠️ LOW BATTERY - PLUG IN</div>
+        <div id="low-bat">⚠️ LOW BATTERY - PLUG IN CHARGER</div>
         
         <div class="status-bar">
             <span id="clock">00:00:00</span>
@@ -54,107 +62,127 @@
 
         <div class="card">
             <h2 id="greet">Hello</h2>
-            <div id="weather" style="font-size: 14px; opacity: 0.7;">Dubai: --°C</div>
+            <div id="current-lesson" style="font-size: 26px; font-weight: 800; margin: 8px 0;">School's Out ✨</div>
+            <div id="countdown" style="font-size: 11px; font-weight: 900; color: var(--accent);">WAITING FOR LESSON...</div>
+            <div class="progress-track"><div id="bar" class="progress-fill"></div></div>
+            <div id="weather" style="font-size: 13px; opacity: 0.6;">Dubai: --°C</div>
         </div>
 
         <div class="card" id="tt-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:12px; font-weight:900; color:var(--accent);">MY TIMETABLE</span>
-                <span onclick="toggleEdit()" style="cursor:pointer; opacity:0.5;">⚙️ Edit</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                <span style="font-size:11px; font-weight:900; color:var(--accent); letter-spacing: 1px;">TODAY'S SCHEDULE</span>
+                <span id="edit-toggle" onclick="toggleEdit()" style="cursor:pointer; opacity:0.5; font-size:12px;">⚙️ Edit</span>
             </div>
-            <table id="tt-table">
-                </table>
-            <button id="save-btn" class="btn btn-save" onclick="saveData()">SAVE CHANGES</button>
+            <table id="tt-table"></table>
+            <button id="save-btn" class="btn btn-save" onclick="saveData()">SAVE TIMETABLE</button>
         </div>
 
-        <button class="btn" style="background:transparent; color:var(--warn); border:1px solid var(--warn)" onclick="logout()">LOGOUT</button>
+        <button class="btn" style="background:transparent; color:var(--warn); border:1px solid rgba(255,68,68,0.3); font-size:12px;" onclick="logout()">LOGOUT / SWITCH USER</button>
     </div>
 
     <script>
-        let currentUser = "";
-        let isEditing = false;
-        // Default subjects
-        let userSubs = ["Maths", "English", "Science", "Break", "History", "Arabic", "Lunch", "PE", "ICT"];
+        let user = "";
+        let editing = false;
+        let subjects = ["Maths", "English", "Science", "Break", "History", "Arabic", "Lunch", "PE", "ICT"];
         const times = ["08:00", "09:00", "10:00", "11:00", "11:20", "12:20", "13:20", "14:00", "15:00"];
+        const endTimes = ["09:00", "10:00", "11:00", "11:20", "12:20", "13:20", "14:00", "15:00", "16:00"];
 
         function login() {
-            const name = document.getElementById('nameIn').value.trim();
-            if(!name) return alert("Enter name");
-            currentUser = name;
-            localStorage.setItem('last_user', name);
+            const name = document.getElementById('nameInput').value.trim();
+            if(!name) return;
+            user = name;
+            localStorage.setItem('repton_last_user', name);
             
-            // Load this specific user's data
-            const saved = localStorage.getItem(`subs_${currentUser}`);
-            if(saved) userSubs = JSON.parse(saved);
+            const saved = localStorage.getItem(`tt_${user}`);
+            if(saved) subjects = JSON.parse(saved);
             
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('hub-ui').style.display = 'block';
-            renderTimetable();
-            startSystems();
+            renderTT();
+            startAll();
         }
 
-        function renderTimetable() {
+        function renderTT() {
             const table = document.getElementById('tt-table');
-            table.innerHTML = "";
-            userSubs.forEach((sub, i) => {
-                table.innerHTML += `
-                    <tr>
-                        <td style="width:60px; font-size:12px; opacity:0.5;">${times[i]}</td>
-                        <td><input class="tt-input" value="${sub}" ${isEditing ? '' : 'readonly'} id="sub-${i}"></td>
-                    </tr>
-                `;
-            });
+            table.innerHTML = subjects.map((s, i) => `
+                <tr>
+                    <td style="width:70px; opacity:0.4; font-weight:800; font-size:12px;">${times[i]}</td>
+                    <td><input class="tt-input" value="${s}" ${editing ? '' : 'readonly'} id="s-${i}"></td>
+                </tr>
+            `).join('');
         }
 
         function toggleEdit() {
-            isEditing = !isEditing;
+            editing = !editing;
             document.getElementById('tt-card').classList.toggle('editing');
-            document.getElementById('save-btn').style.display = isEditing ? 'block' : 'none';
-            renderTimetable();
+            document.getElementById('save-btn').style.display = editing ? 'block' : 'none';
+            document.getElementById('edit-toggle').innerText = editing ? "✖ Cancel" : "⚙️ Edit";
+            renderTT();
         }
 
         function saveData() {
-            userSubs = userSubs.map((_, i) => document.getElementById(`sub-${i}`).value);
-            localStorage.setItem(`subs_${currentUser}`, JSON.stringify(userSubs));
+            subjects = subjects.map((_, i) => document.getElementById(`s-${i}`).value);
+            localStorage.setItem(`tt_${user}`, JSON.stringify(subjects));
             toggleEdit();
         }
 
         function logout() {
-            localStorage.removeItem('last_user');
+            localStorage.removeItem('repton_last_user');
             location.reload();
         }
 
-        async function startSystems() {
-            // Clock
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('clock').innerText = now.toLocaleTimeString();
-                document.getElementById('greet').innerText = `Hello, ${currentUser}!`;
-            }, 1000);
+        function tick() {
+            const now = new Date();
+            const nowMins = now.getHours() * 60 + now.getMinutes();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            document.getElementById('greet').innerText = `Hello, ${user}!`;
+
+            let current = "School's Out ✨";
+            let progress = 0;
+            let countText = "SEE YOU TOMORROW";
+
+            subjects.forEach((s, i) => {
+                const start = parseInt(times[i].split(':')[0])*60 + parseInt(times[i].split(':')[1]);
+                const end = parseInt(endTimes[i].split(':')[0])*60 + parseInt(endTimes[i].split(':')[1]);
+                
+                if(nowMins >= start && nowMins < end) {
+                    current = s;
+                    progress = ((nowMins - start) / (end - start)) * 100;
+                    countText = `${end - nowMins} MINS REMAINING`;
+                }
+            });
+
+            document.getElementById('current-lesson').innerText = current;
+            document.getElementById('bar').style.width = progress + "%";
+            document.getElementById('countdown').innerText = countText;
+        }
+
+        async function startAll() {
+            setInterval(tick, 1000);
+            tick();
 
             // Battery
-            if (navigator.getBattery) {
-                const bat = await navigator.getBattery();
-                const update = () => {
-                    const lvl = Math.round(bat.level * 100);
-                    document.getElementById('bat').innerText = `${lvl}% ${bat.charging ? '⚡' : '🔋'}`;
-                    document.getElementById('low-bat').style.display = (lvl < 20 && !bat.charging) ? 'block' : 'none';
-                }
-                update(); bat.onlevelchange = update; bat.onchargingchange = update;
+            if(navigator.getBattery) {
+                const b = await navigator.getBattery();
+                const u = () => {
+                    const l = Math.round(b.level * 100);
+                    document.getElementById('bat').innerText = `${l}% ${b.charging ? '⚡' : '🔋'}`;
+                    document.getElementById('low-bat').style.display = (l < 20 && !b.charging) ? 'block' : 'none';
+                };
+                u(); b.onlevelchange = u; b.onchargingchange = u;
             }
 
             // Weather
             try {
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.14&longitude=55.37&current=temperature_2m');
-                const data = await res.json();
-                document.getElementById('weather').innerText = `Dubai: ${Math.round(data.current.temperature_2m)}°C`;
+                const d = await res.json();
+                document.getElementById('weather').innerText = `Dubai: ${Math.round(d.current.temperature_2m)}°C`;
             } catch(e) {}
         }
 
-        // Auto-login if remembered
         window.onload = () => {
-            const last = localStorage.getItem('last_user');
-            if(last) { document.getElementById('nameIn').value = last; login(); }
+            const last = localStorage.getItem('repton_last_user');
+            if(last) { document.getElementById('nameInput').value = last; login(); }
         }
     </script>
 </body>
