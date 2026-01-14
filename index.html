@@ -135,15 +135,15 @@
     <script>
         let currentUser = "";
         let editDay = 1;
-        const times = ["08:00", "09:00", "10:00", "11:00", "11:20", "12:20", "13:20", "14:00", "15:00"];
-        const endTimes = ["09:00", "10:00", "11:00", "11:20", "12:20", "13:20", "14:00", "15:00", "16:00"];
+        const times = ["08:00", "09:00", "10:00", "10:20", "11:20", "12:20", "13:00", "14:00", "15:15"];
+        const endTimes = ["09:00", "10:00", "10:20", "11:20", "12:20", "13:00", "14:00", "15:00", "16:00"];
         
         let masterSchedule = {
-            1: ["Maths", "English", "Science", "Break", "History", "Arabic", "Lunch", "PE", "ICT"],
-            2: ["English", "Maths", "ICT", "Break", "Science", "History", "Lunch", "Arabic", "PE"],
-            3: ["Science", "ICT", "Maths", "Break", "PE", "English", "Lunch", "History", "Arabic"],
-            4: ["Arabic", "Science", "English", "Break", "ICT", "Maths", "Lunch", "PE", "History"],
-            5: ["History", "PE", "Arabic", "Break", "English", "Science", "Lunch", "ICT", "Maths"]
+            1: ["Maths", "English", "Science", "Break", "History", "Arabic", "Lunch", "PE", "ECA"],
+            2: ["English", "Maths", "ICT", "Break", "Science", "History", "Lunch", "Arabic", "ECA"],
+            3: ["Science", "ICT", "Maths", "Break", "PE", "English", "Lunch", "History", "ECA"],
+            4: ["Arabic", "Science", "English", "Break", "ICT", "Maths", "Lunch", "PE", "ECA"],
+            5: ["History", "PE", "Arabic", "Break", "English", "Science", "", "", ""]
         };
 
         // --- Auth Logic ---
