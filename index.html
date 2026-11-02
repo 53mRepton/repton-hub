@@ -4,95 +4,160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-<!-- 1. The Core PWA Link (Tells the OS how to treat the app) -->
-  <link rel="manifest" href="/manifest.json">
+    <!-- 1. The Core PWA Link -->
+    <link rel="manifest" href="/manifest.json">
 
-  <!-- 2. Apple / iOS Safari Overrides (Crucial for "Add to Home Screen" on iPhone) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Repton Hub">
+    <!-- 2. Apple / iOS Safari Overrides -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Repton Hub">
 
-  <!-- 3. Android / Chrome / Mobile Overrides -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#4f46e5">
+    <!-- 3. Android / Chrome / Mobile Overrides -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4f46e5">
 
-  <!-- 4. Required Home Screen App Icons (iOS asks for these explicitly) -->
-  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+    <!-- 4. Required Home Screen App Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
 
     <title>Repton Student Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --accent: #2ecc71; --navy: #060e1b; --glass: rgba(255, 255, 255, 0.08); }
+        :root { --accent: #2ecc71; --navy: #040812; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.08); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         .fas, .far { font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; }
 
         body.house-new { --accent: #2ecc71; }
         body.house-orchard { --accent: #CBC3E3; }
-        body.house-latham { --accent: #00008B; }
-        body.house-foremarke { --accent:  #FF0000; }
-        body.house-dahl { --accent: #ADD8E6; }
-        body.house-jumeirah { --accent: #D3D3D3; }
-        body.house-school { --accent: #000000; }
+        body.house-latham { --accent: #3b82f6; }
+        body.house-foremarke { --accent: #ef4444; }
+        body.house-dahl { --accent: #38bdf8; }
+        body.house-jumeirah { --accent: #cbd5e1; }
+        body.house-school { --accent: #f59e0b; }
 
-        body { background: var(--navy); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; transition: 0.5s ease; overflow-x: hidden; }
+        body { 
+            background: var(--navy); 
+            color: #f8fafc; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 24px 16px; 
+            min-height: 100vh; 
+            transition: background 0.5s ease; 
+            overflow-x: hidden; 
+        }
 
-        #login-screen, #settings-screen { position: fixed; inset: 0; background: var(--navy); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(25px); }
+        #login-screen, #settings-screen { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(4, 8, 18, 0.92); 
+            z-index: 2000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(30px); 
+            -webkit-backdrop-filter: blur(30px);
+            animation: fadeIn 0.3s ease;
+        }
         #settings-screen { display: none; overflow-y: auto; padding: 20px; flex-direction: column; }
-        #hub-ui { display: none; width: 100%; max-width: 450px; animation: fadeIn 0.4s ease; }
+        #hub-ui { display: none; width: 100%; max-width: 440px; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
-        .card { background: var(--glass); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px; width: 100%; border-bottom: 3px solid var(--accent); position: relative; transition: 0.3s; }
-        input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; width: 100%; padding: 14px; border-radius: 12px; outline: none; margin-bottom: 12px; font-size: 14px; }
+        .card { 
+            background: var(--glass); 
+            border-radius: 28px; 
+            padding: 28px; 
+            border: 1px solid var(--glass-border); 
+            margin-bottom: 16px; 
+            width: 100%; 
+            border-bottom: 3px solid var(--accent); 
+            position: relative; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .card:hover { border-color: rgba(255,255,255,0.15); }
 
-        .btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; }
-        .btn-primary { background: var(--accent); color: var(--navy); }
+        input, select { 
+            background: rgba(255, 255, 255, 0.04); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            color: white; 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 14px; 
+            outline: none; 
+            margin-bottom: 14px; 
+            font-size: 15px; 
+            transition: 0.2s;
+        }
+        input:focus, select:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.07); }
+        select option { background: #0f172a; color: white; }
 
-        .day-selector { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .day-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
-        .day-btn.active { background: var(--accent); color: var(--navy); border-color: var(--accent); }
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; letter-spacing: 0.5px; transition: 0.2s; }
+        .btn-primary { background: var(--accent); color: #040812; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .btn-primary:active { transform: scale(0.98); }
 
-        .progress-bar { background: rgba(255,255,255,0.05); height: 8px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.5s ease; }
+        .day-selector { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .day-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
+        .day-btn.active { background: var(--accent); color: #040812; border-color: var(--accent); }
 
-        /* New House Ending Alert */
-        .ending-soon { box-shadow: 0 0 20px var(--accent); border-color: var(--accent); }
-        .ending-bar { background: linear-gradient(90deg, var(--accent), #fff); animation: pulse-bar 1s infinite; }
-        @keyframes pulse-bar { 50% { opacity: 0.6; } }
+        .progress-bar { background: rgba(255,255,255,0.06); height: 8px; border-radius: 10px; margin: 18px 0 6px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.5s ease; border-radius: 10px; }
 
-        .tag { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .bat-critical { color: #ff3b30 !important; animation: bat-pulse 1s infinite; }
+        .ending-soon { box-shadow: 0 0 25px var(--accent); border-color: var(--accent); }
+        .ending-bar { background: linear-gradient(90deg, var(--accent), #ffffff); animation: pulse-bar 1s infinite; }
+        @keyframes pulse-bar { 50% { opacity: 0.5; } }
+
+        .tag { font-size: 11px; font-weight: 900; color: var(--accent); letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .bat-critical { color: #ef4444 !important; animation: bat-pulse 1s infinite; }
         @keyframes bat-pulse { 50% { opacity: 0.3; } }
+
+        .weather-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px !important;
+            border-bottom: none !important;
+        }
+
+        .tt-input-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .tt-time-label { font-size: 11px; width: 65px; opacity: 0.4; font-weight: 700; }
     </style>
 </head>
 <body id="app-body">
 
+    <!-- LOGIN SCREEN -->
     <div id="login-screen">
-        <div class="card" style="max-width: 350px; text-align: center;">
-            <i class="fas fa-shield-alt" style="font-size: 40px; color: var(--accent); margin-bottom: 15px;"></i>
-            <h2 style="color: var(--accent); margin-bottom: 25px;">REPTON PORTAL</h2>
-            <input type="text" id="username" placeholder="Enter Name">
+        <div class="card" style="max-width: 360px; text-align: center; border-bottom: 3px solid var(--accent);">
+            <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.05); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; border: 1px solid var(--glass-border);">
+                <i class="fas fa-shield-alt" style="font-size: 28px; color: var(--accent);"></i>
+            </div>
+            <h2 style="color: white; margin-bottom: 6px; font-weight: 800; font-size: 22px;">REPTON PORTAL</h2>
+            <p style="font-size: 12px; opacity: 0.5; margin-bottom: 24px;">Enter your details to access your hub</p>
+            <input type="text" id="username" placeholder="Full Name">
             <select id="house-select" onchange="previewHouse(this.value)">
-                <option value="new">New</option>
-                <option value="orchard">Orchard</option>
-                <option value="latham">Latham</option>
-                <option value="foremarke">Foremarke</option>
-                <option value="dahl">Dahl</option>
-                <option value="jumeirah">Jumeirah</option>
-                <option value="school">School</option>
+                <option value="new">New House</option>
+                <option value="orchard">Orchard House</option>
+                <option value="latham">Latham House</option>
+                <option value="foremarke">Foremarke House</option>
+                <option value="dahl">Dahl House</option>
+                <option value="jumeirah">Jumeirah House</option>
+                <option value="school">School House</option>
             </select>
-            <button class="btn btn-primary" onclick="handleLogin()">Welcome</button>
+            <button class="btn btn-primary" onclick="handleLogin()">Enter Portal</button>
         </div>
     </div>
 
+    <!-- SETTINGS / TIMETABLE EDITOR SCREEN -->
     <div id="settings-screen">
-        <div class="card" style="max-width: 420px;">
+        <div class="card" style="max-width: 440px;">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="margin:0;">Timetable Editor</h3>
-                <i class="fas fa-times" onclick="closeSettings()" style="cursor:pointer; opacity:0.5;"></i>
+                <h3 style="margin:0; font-size: 18px; font-weight: 800;">Timetable Editor</h3>
+                <i class="fas fa-times" onclick="closeSettings()" style="cursor:pointer; opacity:0.5; font-size: 18px; padding: 5px;"></i>
             </div>
 
             <div class="day-selector">
@@ -103,28 +168,29 @@
                 <button class="day-btn" id="d-btn-5" onclick="changeDay(5)">FRI</button>
             </div>
 
-            <div id="editor-grid" style="max-height: 45vh; overflow-y: auto; padding-right: 5px;"></div>
+            <div id="editor-grid" style="max-height: 42vh; overflow-y: auto; padding-right: 4px;"></div>
 
-            <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <p style="font-size: 10px; opacity: 0.5; margin-bottom: 10px;">Switch House Theme</p>
-                <select id="house-switch" onchange="previewHouse(this.value)">
-                    <option value="new">New</option>
-                    <option value="orchard">Orchard</option>
-                    <option value="latham">Latham</option>
-                    <option value="foremarke">Foremarke</option>
-                    <option value="dahl">Dahl</option>
-                    <option value="jumeirah">Jumeirah</option>
-                    <option value="school">School</option>
+            <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px;">
+                <p style="font-size: 11px; opacity: 0.5; margin-bottom: 8px; font-weight: 600;">House Theme</p>
+                <select id="house-switch" onchange="previewHouse(this.value)" style="margin-bottom: 16px;">
+                    <option value="new">New House</option>
+                    <option value="orchard">Orchard House</option>
+                    <option value="latham">Latham House</option>
+                    <option value="foremarke">Foremarke House</option>
+                    <option value="dahl">Dahl House</option>
+                    <option value="jumeirah">Jumeirah House</option>
+                    <option value="school">School House</option>
                 </select>
-                <button class="btn btn-primary" onclick="saveAll()">SAVE ALL CHANGES</button>
+                <button class="btn btn-primary" onclick="saveAll()">SAVE CHANGES</button>
             </div>
         </div>
     </div>
 
+    <!-- MAIN HUB UI -->
     <div id="hub-ui">
-        <div style="display: flex; justify-content: space-between; font-size: 11px; opacity: 0.8; margin-bottom: 12px; font-weight: 900;">
-            <span><i class="far fa-clock"></i> <span id="clock">00:00</span></span>
-            <span id="bat-container" style="display: flex; align-items: center; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.7; margin-bottom: 14px; font-weight: 800; padding: 0 4px;">
+            <span><i class="far fa-clock" style="margin-right: 4px;"></i> <span id="clock">00:00</span></span>
+            <span id="bat-container" style="display: flex; align-items: center; gap: 8px;">
                 <span id="bat-pct">--%</span>
                 <i id="bat-icon" class="fas fa-battery-full"></i>
             </span>
@@ -133,21 +199,33 @@
         <div class="card" id="main-card">
             <span class="tag" id="house-tag">HOUSE</span>
             <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <h2 id="greet">Hello,</h2>
-                <i class="fas fa-calendar-alt" onclick="openSettings()" style="cursor:pointer; opacity: 0.4; font-size: 18px;"></i>
+                <h2 id="greet" style="font-size: 24px; font-weight: 800;">Hello,</h2>
+                <i class="fas fa-sliders-h" onclick="openSettings()" style="cursor:pointer; opacity: 0.4; font-size: 18px; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4"></i>
             </div>
 
-            <div style="margin-top: 25px;">
-                <div id="cur-lesson" style="font-size: 32px; font-weight: 900; margin: 5px 0; line-height: 1.1;">--</div>
-                <div id="timer" style="font-size: 11px; font-weight: 700; opacity: 0.5; letter-spacing: 0.5px;">STANDBY</div>
+            <div style="margin-top: 28px;">
+                <div id="cur-lesson" style="font-size: 30px; font-weight: 900; margin: 4px 0; line-height: 1.15; letter-spacing: -0.5px;">--</div>
+                <div id="timer" style="font-size: 11px; font-weight: 800; opacity: 0.5; letter-spacing: 1px; margin-top: 6px;">STANDBY</div>
             </div>
             <div class="progress-bar"><div id="bar" class="progress-fill"></div></div>
         </div>
 
-        <div class="card" style="padding: 15px; display: flex; justify-content: center; gap: 15px; align-items: center; border-bottom: none;">
-            <i class="fas fa-map-marker-alt" style="color: var(--accent); font-size: 12px;"></i>
-            <span style="font-size: 11px; font-weight: 900; opacity: 0.4;">Repton Dubai</span>
-            <h3 id="w-temp" style="font-size: 18px; font-weight: 900;">--°</h3>
+        <div class="card weather-card">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border);">
+                    <i class="fas fa-map-marker-alt" style="color: var(--accent); font-size: 13px;"></i>
+                </div>
+                <div>
+                    <div style="font-size: 12px; font-weight: 800; color: white;">Repton Dubai</div>
+                    <div style="font-size: 10px; opacity: 0.4; font-weight: 600;">Live Weather</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div id="w-icon-container" style="font-size: 22px; color: var(--accent);">
+                    <i class="fas fa-sun" id="weather-icon"></i>
+                </div>
+                <h3 id="w-temp" style="font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">--°</h3>
+            </div>
         </div>
     </div>
 
@@ -176,18 +254,23 @@
             { s: "11:20", e: "11:30", label: "Final Wrap" }
         ];
 
-        function previewHouse(h) { document.body.className = `house-${h}`; }
+        function previewHouse(h) { 
+            document.body.className = `house-${h}`; 
+            document.getElementById('house-select').value = h;
+            document.getElementById('house-switch').value = h;
+        }
 
         function handleLogin() {
             const name = document.getElementById('username').value.trim();
             const house = document.getElementById('house-select').value;
             if(!name) return;
-            const saved = localStorage.getItem(`repton_v13_${name}`);
+            const saved = localStorage.getItem(`repton_v14_${name}`);
             userData = saved ? JSON.parse(saved) : { name, house, schedule: {1:[], 2:[], 3:[], 4:[], 5:[]} };
+            userData.house = house;
             saveToStorage();
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('hub-ui').style.display = 'block';
-            document.getElementById('house-tag').innerText = `${userData.house} House`;
+            document.getElementById('house-tag').innerText = `${userData.house.toUpperCase()} HOUSE`;
             previewHouse(userData.house);
             start();
         }
@@ -202,7 +285,7 @@
         function closeSettings() { document.getElementById('settings-screen').style.display = 'none'; }
 
         function changeDay(d) {
-            saveInputs(); // Save what was typed in the previous day tab
+            saveInputs();
             activeEditDay = d;
             renderEditor();
         }
@@ -216,8 +299,8 @@
             const dayData = userData.schedule[activeEditDay] || [];
 
             grid.innerHTML = slots.map((s, i) => `
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                    <span style="font-size:10px; width:60px; opacity:0.3; font-weight:bold;">${s.s}</span>
+                <div class="tt-input-wrapper">
+                    <span class="tt-time-label">${s.s}</span>
                     <input class="tt-edit-input" data-idx="${i}" value="${dayData[i] || ''}" placeholder="${s.label}">
                 </div>`).join('');
         }
@@ -238,7 +321,10 @@
             location.reload();
         }
 
-        function saveToStorage() { localStorage.setItem(`repton_v13_${userData.name}`, JSON.stringify(userData)); localStorage.setItem('last_v13', userData.name); }
+        function saveToStorage() { 
+            localStorage.setItem(`repton_v14_${userData.name}`, JSON.stringify(userData)); 
+            localStorage.setItem('last_v14', userData.name); 
+        }
 
         function updateBattery(b) {
             const pct = Math.round(b.level * 100);
@@ -248,13 +334,25 @@
             icon.classList.remove('bat-critical');
             if(b.charging) { icon.classList.add('fa-bolt'); icon.style.color = 'var(--accent)'; }
             else {
-                icon.style.color = 'white';
+                icon.style.color = '#f8fafc';
                 if(pct > 85) icon.classList.add('fa-battery-full');
                 else if(pct > 65) icon.classList.add('fa-battery-three-quarters');
                 else if(pct > 35) icon.classList.add('fa-battery-half');
                 else if(pct > 15) icon.classList.add('fa-battery-quarter');
                 else { icon.classList.add('fa-battery-empty'); icon.classList.add('bat-critical'); }
             }
+        }
+
+        function getWeatherIconClass(code) {
+            // WMO Weather interpretation codes mapped to FontAwesome icons
+            if (code === 0) return 'fa-sun';
+            if (code >= 1 && code <= 3) return 'fa-cloud-sun';
+            if (code === 45 || code === 48) return 'fa-smog';
+            if (code >= 51 && code <= 67) return 'fa-cloud-rain';
+            if (code >= 71 && code <= 77) return 'fa-snowflake';
+            if (code >= 80 && code <= 82) return 'fa-cloud-showers-heavy';
+            if (code >= 95 && code <= 99) return 'fa-bolt';
+            return 'fa-cloud';
         }
 
         function tick() {
@@ -289,7 +387,6 @@
             const bar = document.getElementById('bar');
             bar.style.width = prog + "%";
 
-            // Visual Alert Logic
             const card = document.getElementById('main-card');
             if(isEnding) {
                 card.classList.add('ending-soon');
@@ -306,10 +403,13 @@
             setInterval(tick, 1000);
             tick();
             try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.14&longitude=55.37&current=temperature_2m&timezone=auto');
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.14&longitude=55.37&current=temperature_2m,weather_code&timezone=auto');
                 const d = await res.json();
                 document.getElementById('w-temp').innerText = Math.round(d.current.temperature_2m) + "°";
+                const iconClass = getWeatherIconClass(d.current.weather_code);
+                document.getElementById('weather-icon').className = `fas ${iconClass}`;
             } catch(e) {}
+
             if(navigator.getBattery) {
                 const b = await navigator.getBattery();
                 if (document.fonts) { await document.fonts.ready; updateBattery(b); }
@@ -319,9 +419,9 @@
         }
 
         window.onload = () => {
-            const last = localStorage.getItem('last_v13');
+            const last = localStorage.getItem('last_v14');
             if(last) {
-                const saved = localStorage.getItem(`repton_v13_${last}`);
+                const saved = localStorage.getItem(`repton_v14_${last}`);
                 if(saved) { userData = JSON.parse(saved); handleLogin(); }
             }
         }
