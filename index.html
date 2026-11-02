@@ -10,7 +10,7 @@
   <!-- 2. Apple / iOS Safari Overrides (Crucial for "Add to Home Screen" on iPhone) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="YourAppName">
+  <meta name="apple-mobile-web-app-title" content="Repton Hub">
 
   <!-- 3. Android / Chrome / Mobile Overrides -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -30,12 +30,12 @@
         .fas, .far { font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; }
 
         body.house-new { --accent: #2ecc71; }
-        body.house-orchard { --accent: #ff3b30; }
-        body.house-latham { --accent: #007aff; }
-        body.house-foremarke { --accent: #ff9500; }
-        body.house-dahl { --accent: #af52de; }
-        body.house-jumeirah { --accent: #55efc4; }
-        body.house-school { --accent: #ffcc00; }
+        body.house-orchard { --accent: #CBC3E3; }
+        body.house-latham { --accent: #00008B; }
+        body.house-foremarke { --accent:  #FF0000; }
+        body.house-dahl { --accent: #ADD8E6; }
+        body.house-jumeirah { --accent: #D3D3D3; }
+        body.house-school { --accent: #000000; }
 
         body { background: var(--navy); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; transition: 0.5s ease; overflow-x: hidden; }
 
@@ -76,13 +76,13 @@
             <h2 style="color: var(--accent); margin-bottom: 25px;">REPTON PORTAL</h2>
             <input type="text" id="username" placeholder="Enter Name">
             <select id="house-select" onchange="previewHouse(this.value)">
-                <option value="new">New House (Green)</option>
-                <option value="orchard">Orchard (Red)</option>
-                <option value="latham">Latham (Blue)</option>
-                <option value="foremarke">Foremarke (Orange)</option>
-                <option value="dahl">Dahl (Purple)</option>
-                <option value="jumeirah">Jumeirah (Teal)</option>
-                <option value="school">School (Yellow)</option>
+                <option value="new">New House</option>
+                <option value="orchard">Orchard</option>
+                <option value="latham">Latham</option>
+                <option value="foremarke">Foremarke</option>
+                <option value="dahl">Dahl</option>
+                <option value="jumeirah">Jumeirah</option>
+                <option value="school">School</option>
             </select>
             <button class="btn btn-primary" onclick="handleLogin()">ACCESS</button>
         </div>
@@ -108,7 +108,7 @@
             <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <p style="font-size: 10px; opacity: 0.5; margin-bottom: 10px;">Switch House Theme</p>
                 <select id="house-switch" onchange="previewHouse(this.value)">
-                    <option value="new">New House</option>
+                    <option value="new">New</option>
                     <option value="orchard">Orchard</option>
                     <option value="latham">Latham</option>
                     <option value="foremarke">Foremarke</option>
