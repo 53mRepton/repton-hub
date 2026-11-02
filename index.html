@@ -45,20 +45,19 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .card { background: var(--glass); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px; width: 100%; border-bottom: 3px solid var(--accent); position: relative; transition: 0.3s; }
-        input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; width: 100%; padding: 14px; border-radius: 12px; outline: none; margin-bottom: 12px; font-size: 14px; }
-
+        .card { background: var(--glass); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px; width: 100%; border-bottom: 3px solid var(--accent); position: relative; }
+        input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; width: 100%; padding: 14px; border-radius: 12px; outline: none; margin-bottom: 12px; }
+        input::placeholder { color: rgba(255,255,255,0.45); }
         .btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; }
         .btn-primary { background: var(--accent); color: var(--navy); }
 
         .day-selector { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .day-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 11px; font-weight: 700; transition: 0.2s; }
+        .day-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 11px; font-weight: 700; }
         .day-btn.active { background: var(--accent); color: var(--navy); border-color: var(--accent); }
 
         .progress-bar { background: rgba(255,255,255,0.05); height: 8px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.5s ease; }
 
-        /* New House Ending Alert */
         .ending-soon { box-shadow: 0 0 20px var(--accent); border-color: var(--accent); }
         .ending-bar { background: linear-gradient(90deg, var(--accent), #fff); animation: pulse-bar 1s infinite; }
         @keyframes pulse-bar { 50% { opacity: 0.6; } }
@@ -66,6 +65,66 @@
         .tag { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
         .bat-critical { color: #ff3b30 !important; animation: bat-pulse 1s infinite; }
         @keyframes bat-pulse { 50% { opacity: 0.3; } }
+
+        .weather-card { padding: 18px 20px; }
+
+        .weather-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .weather-status {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            opacity: 0.6;
+            text-transform: uppercase;
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .weather-temp {
+            font-size: 30px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .weather-sub {
+            opacity: 0.7;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .weather-icon {
+            width: 54px;
+            height: 54px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.15));
+        }
+
+        .weather-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            gap: 10px;
+            font-size: 11px;
+            opacity: 0.8;
+            font-weight: 700;
+        }
+
+        .weather-meta div {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body id="app-body">
@@ -144,10 +203,24 @@
             <div class="progress-bar"><div id="bar" class="progress-fill"></div></div>
         </div>
 
-        <div class="card" style="padding: 15px; display: flex; justify-content: center; gap: 15px; align-items: center; border-bottom: none;">
-            <i class="fas fa-map-marker-alt" style="color: var(--accent); font-size: 12px;"></i>
-            <span style="font-size: 11px; font-weight: 900; opacity: 0.4;">NAD AL SHEBA</span>
-            <h3 id="w-temp" style="font-size: 18px; font-weight: 900;">--°</h3>
+        <div class="card weather-card">
+            <div class="weather-header">
+                <span class="tag">Weather</span>
+                <span class="weather-status" id="weather-status">Now</span>
+            </div>
+
+            <div class="weather-main">
+                <div>
+                    <div id="w-temp" class="weather-temp">--°</div>
+                    <div id="w-feels" class="weather-sub">Feels like --°</div>
+                </div>
+                <img id="weather-icon" class="weather-icon" alt="Weather icon" src="https://openweathermap.org/img/wn/01d@2x.png">
+            </div>
+
+            <div class="weather-meta">
+                <div><i class="fas fa-tint"></i> <span id="w-humidity">--%</span></div>
+                <div><i class="fas fa-wind"></i> <span id="w-wind">-- km/h</span></div>
+            </div>
         </div>
     </div>
 
@@ -202,7 +275,7 @@
         function closeSettings() { document.getElementById('settings-screen').style.display = 'none'; }
 
         function changeDay(d) {
-            saveInputs(); // Save what was typed in the previous day tab
+            saveInputs();
             activeEditDay = d;
             renderEditor();
         }
@@ -257,6 +330,48 @@
             }
         }
 
+        function mapOpenMeteoToOwm(code) {
+            if (code === 0 || code === 1) return '01d';
+            if (code === 2) return '02d';
+            if (code === 3) return '04d';
+            if ([45, 48].includes(code)) return '50d';
+            if ([51, 53, 55, 56, 57].includes(code)) return '09d';
+            if ([61, 63, 65, 80, 81, 82].includes(code)) return '10d';
+            if ([71, 73, 75, 77, 85, 86].includes(code)) return '13d';
+            if ([95, 96, 99].includes(code)) return '11d';
+            return '01d';
+        }
+
+        function updateWeather(data) {
+            const current = data.current || {};
+            const temp = Math.round(current.temperature_2m ?? 0);
+            const feels = Math.round(current.apparent_temperature ?? temp);
+            const humidity = Math.round(current.relative_humidity_2m ?? 0);
+            const wind = Math.round(current.wind_speed_10m ?? 0);
+            const weatherCode = current.weather_code ?? 0;
+            const weatherIconId = mapOpenMeteoToOwm(weatherCode);
+
+            document.getElementById('w-temp').innerText = temp + '°';
+            document.getElementById('w-feels').innerText = `Feels like ${feels}°`;
+            document.getElementById('w-humidity').innerText = humidity + '%';
+            document.getElementById('w-wind').innerText = wind + ' km/h';
+            document.getElementById('weather-icon').src = `https://openweathermap.org/img/wn/${weatherIconId}@2x.png`;
+            document.getElementById('weather-icon').alt = `Weather icon ${weatherIconId}`;
+        }
+
+        async function loadWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.14&longitude=55.37&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto');
+                const d = await res.json();
+                updateWeather(d);
+            } catch(e) {
+                document.getElementById('w-temp').innerText = '--°';
+                document.getElementById('w-feels').innerText = 'Feels like --°';
+                document.getElementById('w-humidity').innerText = '--%';
+                document.getElementById('w-wind').innerText = '-- km/h';
+            }
+        }
+
         function tick() {
             const now = new Date();
             const day = now.getDay();
@@ -289,7 +404,6 @@
             const bar = document.getElementById('bar');
             bar.style.width = prog + "%";
 
-            // Visual Alert Logic
             const card = document.getElementById('main-card');
             if(isEnding) {
                 card.classList.add('ending-soon');
@@ -305,11 +419,7 @@
         async function start() {
             setInterval(tick, 1000);
             tick();
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.14&longitude=55.37&current=temperature_2m&timezone=auto');
-                const d = await res.json();
-                document.getElementById('w-temp').innerText = Math.round(d.current.temperature_2m) + "°";
-            } catch(e) {}
+            loadWeather();
             if(navigator.getBattery) {
                 const b = await navigator.getBattery();
                 if (document.fonts) { await document.fonts.ready; updateBattery(b); }
