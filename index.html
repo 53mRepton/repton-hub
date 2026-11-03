@@ -26,21 +26,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #2ecc71; --navy: #040812; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.08); }
+        :root { 
+            --accent: #2ecc71; 
+            --navy: #040812; 
+            --bg-glow: rgba(46, 204, 113, 0.03);
+            --glass: rgba(255, 255, 255, 0.05); 
+            --glass-border: rgba(255, 255, 255, 0.08); 
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         .fas, .far { font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; }
 
-        body.house-new { --accent: #2ecc71; }
-        body.house-orchard { --accent: #CBC3E3; }
-        body.house-latham { --accent: #3b82f6; }
-        body.house-foremarke { --accent: #ef4444; }
-        body.house-dahl { --accent: #38bdf8; }
-        body.house-jumeirah { --accent: #cbd5e1; }
-        body.house-school { --accent: #f59e0b; }
+        body.house-new { --accent: #2ecc71; --bg-glow: rgba(46, 204, 113, 0.04); }
+        body.house-orchard { --accent: #CBC3E3; --bg-glow: rgba(203, 195, 227, 0.04); }
+        body.house-latham { --accent: #3b82f6; --bg-glow: rgba(59, 130, 246, 0.04); }
+        body.house-foremarke { --accent: #ef4444; --bg-glow: rgba(239, 68, 68, 0.04); }
+        body.house-dahl { --accent: #38bdf8; --bg-glow: rgba(56, 189, 248, 0.04); }
+        body.house-jumeirah { --accent: #cbd5e1; --bg-glow: rgba(203, 213, 225, 0.04); }
+        body.house-school { --accent: #f59e0b; --bg-glow: rgba(245, 158, 11, 0.04); }
 
         body { 
-            background: var(--navy); 
+            background: radial-gradient(circle at top, var(--bg-glow) 0%, var(--navy) 70%);
             color: #f8fafc; 
             display: flex; 
             flex-direction: column; 
@@ -100,6 +106,7 @@
         .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; letter-spacing: 0.5px; transition: 0.2s; }
         .btn-primary { background: var(--accent); color: #040812; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: rgba(255,255,255,0.06); color: white; border: 1px solid var(--glass-border); margin-top: 8px; }
 
         .day-selector { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
         .day-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
@@ -124,8 +131,16 @@
             border-bottom: none !important;
         }
 
-        .tt-input-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .tt-input-group { margin-bottom: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); }
+        .tt-input-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
         .tt-time-label { font-size: 11px; width: 65px; opacity: 0.4; font-weight: 700; }
+
+        /* Homework styles */
+        .hw-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 12px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .hw-item.completed span { text-decoration: line-through; opacity: 0.4; }
+        
+        /* Install Banner */
+        #install-banner { display: none; position: fixed; bottom: 20px; left: 16px; right: 16px; max-width: 410px; margin: 0 auto; background: #0f172a; border: 1px solid var(--accent); z-index: 3000; padding: 16px 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); align-items: center; justify-content: space-between; }
     </style>
 </head>
 <body id="app-body">
@@ -168,7 +183,7 @@
                 <button class="day-btn" id="d-btn-5" onclick="changeDay(5)">FRI</button>
             </div>
 
-            <div id="editor-grid" style="max-height: 42vh; overflow-y: auto; padding-right: 4px;"></div>
+            <div id="editor-grid" style="max-height: 40vh; overflow-y: auto; padding-right: 4px;"></div>
 
             <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px;">
                 <p style="font-size: 11px; opacity: 0.5; margin-bottom: 8px; font-weight: 600;">House Theme</p>
@@ -196,6 +211,7 @@
             </span>
         </div>
 
+        <!-- CURRENT LESSON CARD -->
         <div class="card" id="main-card">
             <span class="tag" id="house-tag">HOUSE</span>
             <div style="display: flex; justify-content: space-between; align-items: baseline;">
@@ -203,13 +219,15 @@
                 <i class="fas fa-sliders-h" onclick="openSettings()" style="cursor:pointer; opacity: 0.4; font-size: 18px; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4"></i>
             </div>
 
-            <div style="margin-top: 28px;">
-                <div id="cur-lesson" style="font-size: 30px; font-weight: 900; margin: 4px 0; line-height: 1.15; letter-spacing: -0.5px;">--</div>
+            <div style="margin-top: 24px;">
+                <div id="cur-lesson" style="font-size: 26px; font-weight: 900; margin: 4px 0; line-height: 1.15; letter-spacing: -0.5px;">--</div>
+                <div id="cur-details" style="font-size: 13px; opacity: 0.6; font-weight: 600; margin-bottom: 4px;"></div>
                 <div id="timer" style="font-size: 11px; font-weight: 800; opacity: 0.5; letter-spacing: 1px; margin-top: 6px;">STANDBY</div>
             </div>
             <div class="progress-bar"><div id="bar" class="progress-fill"></div></div>
         </div>
 
+        <!-- WEATHER CARD -->
         <div class="card weather-card">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border);">
@@ -227,11 +245,33 @@
                 <h3 id="w-temp" style="font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">--°</h3>
             </div>
         </div>
+
+        <!-- HOMEWORK & ASSIGNMENTS CARD -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <span class="tag" style="margin: 0;">Assignments</span>
+                <i class="fas fa-plus" onclick="promptAddHomework()" style="cursor: pointer; font-size: 14px; color: var(--accent);"></i>
+            </div>
+            <div id="homework-list">
+                <p style="font-size: 12px; opacity: 0.4; text-align: center; padding: 10px 0;">No active homework. Tap + to add.</p>
+            </div>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 10px;" onclick="promptAddHomework()">+ Add Assignment</button>
+        </div>
+    </div>
+
+    <!-- INSTALL PROMPT BANNER -->
+    <div id="install-banner">
+        <div>
+            <div style="font-weight: 800; font-size: 14px; color: white;">Install Repton Hub</div>
+            <div style="font-size: 11px; opacity: 0.6;">Add to home screen for offline access</div>
+        </div>
+        <button class="btn btn-primary" id="install-btn" style="width: auto; padding: 10px 16px; font-size: 12px;">Install</button>
     </div>
 
     <script>
-        let userData = { name: "", house: "new", schedule: {1:[], 2:[], 3:[], 4:[], 5:[]} };
+        let userData = { name: "", house: "new", schedule: {1:{}, 2:{}, 3:{}, 4:{}, 5:{}}, homework: [] };
         let activeEditDay = 1;
+        let deferredPrompt = null;
 
         const standardSlots = [
             { s: "07:40", e: "08:00", label: "Registration" },
@@ -254,39 +294,51 @@
             { s: "11:20", e: "11:30", label: "Final Wrap" }
         ];
 
+        function vibrate(ms = 15) {
+            if (navigator.vibrate) navigator.vibrate(ms);
+        }
+
         function previewHouse(h) { 
             document.body.className = `house-${h}`; 
             document.getElementById('house-select').value = h;
             document.getElementById('house-switch').value = h;
+            vibrate(10);
         }
 
         function handleLogin() {
             const name = document.getElementById('username').value.trim();
             const house = document.getElementById('house-select').value;
             if(!name) return;
-            const saved = localStorage.getItem(`repton_v14_${name}`);
-            userData = saved ? JSON.parse(saved) : { name, house, schedule: {1:[], 2:[], 3:[], 4:[], 5:[]} };
+            vibrate(20);
+            const saved = localStorage.getItem(`repton_v15_${name}`);
+            userData = saved ? JSON.parse(saved) : { name, house, schedule: {1:{}, 2:{}, 3:{}, 4:{}, 5:{}}, homework: [] };
             userData.house = house;
             saveToStorage();
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('hub-ui').style.display = 'block';
             document.getElementById('house-tag').innerText = `${userData.house.toUpperCase()} HOUSE`;
             previewHouse(userData.house);
+            renderHomework();
             start();
         }
 
         function openSettings() {
+            vibrate(15);
             activeEditDay = new Date().getDay() || 1;
             if(activeEditDay > 5) activeEditDay = 1;
             renderEditor();
             document.getElementById('settings-screen').style.display = 'flex';
         }
 
-        function closeSettings() { document.getElementById('settings-screen').style.display = 'none'; }
+        function closeSettings() { 
+            vibrate(10);
+            document.getElementById('settings-screen').style.display = 'none'; 
+        }
 
         function changeDay(d) {
             saveInputs();
             activeEditDay = d;
+            vibrate(10);
             renderEditor();
         }
 
@@ -296,20 +348,37 @@
 
             const grid = document.getElementById('editor-grid');
             const slots = (activeEditDay === 5) ? fridaySlots : standardSlots;
-            const dayData = userData.schedule[activeEditDay] || [];
+            const dayData = userData.schedule[activeEditDay] || {};
 
-            grid.innerHTML = slots.map((s, i) => `
-                <div class="tt-input-wrapper">
-                    <span class="tt-time-label">${s.s}</span>
-                    <input class="tt-edit-input" data-idx="${i}" value="${dayData[i] || ''}" placeholder="${s.label}">
-                </div>`).join('');
+            grid.innerHTML = slots.map((s, i) => {
+                const item = dayData[i] || { subject: '', teacher: '', room: '' };
+                return `
+                <div class="tt-input-group">
+                    <div class="tt-input-wrapper">
+                        <span class="tt-time-label">${s.s}</span>
+                        <input class="tt-subj" data-idx="${i}" value="${item.subject || ''}" placeholder="${s.label}">
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input class="tt-teach" data-idx="${i}" value="${item.teacher || ''}" placeholder="Teacher (e.g. Mr. Smith)" style="margin-bottom:0; font-size:13px; padding:10px;">
+                        <input class="tt-room" data-idx="${i}" value="${item.room || ''}" placeholder="Room (e.g. R304)" style="margin-bottom:0; font-size:13px; padding:10px;">
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function saveInputs() {
-            const inputs = document.querySelectorAll('.tt-edit-input');
-            if(inputs.length) {
-                const temp = [];
-                inputs.forEach(inp => temp[inp.dataset.idx] = inp.value);
+            const subjs = document.querySelectorAll('.tt-subj');
+            const teachs = document.querySelectorAll('.tt-teach');
+            const rooms = document.querySelectorAll('.tt-room');
+            if(subjs.length) {
+                const temp = {};
+                subjs.forEach((inp, i) => {
+                    temp[i] = {
+                        subject: inp.value,
+                        teacher: teachs[i].value,
+                        room: rooms[i].value
+                    };
+                });
                 userData.schedule[activeEditDay] = temp;
             }
         }
@@ -318,12 +387,62 @@
             saveInputs();
             userData.house = document.getElementById('house-switch').value;
             saveToStorage();
+            vibrate(30);
             location.reload();
         }
 
         function saveToStorage() { 
-            localStorage.setItem(`repton_v14_${userData.name}`, JSON.stringify(userData)); 
-            localStorage.setItem('last_v14', userData.name); 
+            localStorage.setItem(`repton_v15_${userData.name}`, JSON.stringify(userData)); 
+            localStorage.setItem('last_v15', userData.name); 
+        }
+
+        // Homework functions
+        function promptAddHomework() {
+            vibrate(15);
+            const title = prompt("Assignment / Homework title:");
+            if(!title) return;
+            const due = prompt("Due date (e.g., Tomorrow, Friday):", "Tomorrow");
+            if(!userData.homework) userData.homework = [];
+            userData.homework.push({ id: Date.now(), title, due, completed: false });
+            saveToStorage();
+            renderHomework();
+        }
+
+        function toggleHomework(id) {
+            vibrate(15);
+            const item = userData.homework.find(h => h.id === id);
+            if(item) {
+                item.completed = !item.completed;
+                saveToStorage();
+                renderHomework();
+            }
+        }
+
+        function deleteHomework(id) {
+            vibrate(15);
+            userData.homework = userData.homework.filter(h => h.id !== id);
+            saveToStorage();
+            renderHomework();
+        }
+
+        function renderHomework() {
+            const container = document.getElementById('homework-list');
+            if(!userData.homework || userData.homework.length === 0) {
+                container.innerHTML = `<p style="font-size: 12px; opacity: 0.4; text-align: center; padding: 10px 0;">No active homework. Tap + to add.</p>`;
+                return;
+            }
+            container.innerHTML = userData.homework.map(h => `
+                <div class="hw-item ${h.completed ? 'completed' : ''}">
+                    <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;" onclick="toggleHomework(${h.id})">
+                        <i class="far ${h.completed ? 'fa-check-square' : 'fa-square'}" style="color: var(--accent); font-size: 16px;"></i>
+                        <div>
+                            <span style="font-size: 13px; font-weight: 700; color: white; display: block;">${h.title}</span>
+                            <span style="font-size: 10px; opacity: 0.5;">Due: ${h.due}</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-trash-alt" onclick="deleteHomework(${h.id})" style="font-size: 12px; opacity: 0.3; cursor: pointer; padding: 6px;"></i>
+                </div>
+            `).join('');
         }
 
         function updateBattery(b) {
@@ -344,7 +463,6 @@
         }
 
         function getWeatherIconClass(code) {
-            // WMO Weather interpretation codes mapped to FontAwesome icons
             if (code === 0) return 'fa-sun';
             if (code >= 1 && code <= 3) return 'fa-cloud-sun';
             if (code === 45 || code === 48) return 'fa-smog';
@@ -359,10 +477,11 @@
             const now = new Date();
             const day = now.getDay();
             const mins = now.getHours() * 60 + now.getMinutes();
-            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('clock').innerText = timeStr;
             document.getElementById('greet').innerText = `Hey, ${userData.name.split(' ')[0]}`;
 
-            let lesson = "Day Over", prog = 0, msg = "RELAX";
+            let lesson = "Day Over", details = "", prog = 0, msg = "RELAX";
             let isEnding = false;
 
             if(day >= 1 && day <= 5) {
@@ -373,17 +492,31 @@
                     const sM = parseInt(s.s.split(':')[0])*60 + parseInt(s.s.split(':')[1]);
                     const eM = parseInt(s.e.split(':')[0])*60 + parseInt(s.e.split(':')[1]);
                     if(mins >= sM && mins < eM) {
-                        lesson = userData.schedule[day][i] || s.label;
+                        const custom = userData.schedule[day] && userData.schedule[day][i];
+                        lesson = (custom && custom.subject) ? custom.subject : s.label;
+                        
+                        if (custom && (custom.teacher || custom.room)) {
+                            details = `${custom.teacher ? custom.teacher : ''} ${custom.room ? '• ' + custom.room : ''}`;
+                        } else {
+                            details = `${s.s} – ${s.e}`;
+                        }
+
                         prog = ((mins - sM) / (eM - sM)) * 100;
                         let rem = eM - mins;
                         msg = `${rem}m REMAINING`;
                         if(rem <= 5) isEnding = true;
+
+                        // Dynamic tab title update for lock screen / tab inspection
+                        document.title = `(${rem}m) Repton Portal`;
                     }
                 });
-                if(mins >= endLimit) { lesson = "Dismissed"; msg = "GO HOME"; }
+                if(mins >= endLimit) { lesson = "Dismissed"; details = "School's out"; msg = "GO HOME"; document.title = "Repton Portal"; }
+            } else {
+                document.title = "Repton Portal";
             }
 
             document.getElementById('cur-lesson').innerText = lesson;
+            document.getElementById('cur-details').innerText = details;
             const bar = document.getElementById('bar');
             bar.style.width = prog + "%";
 
@@ -416,12 +549,35 @@
                 b.onlevelchange = () => updateBattery(b);
                 b.onchargingchange = () => updateBattery(b);
             }
+
+            // Register Service Worker for offline PWA capabilities
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.catch.js').catch(() => {});
+            }
         }
 
+        // PWA Install prompt handler
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-banner').style.display = 'flex';
+        });
+
+        document.getElementById('install-btn').addEventListener('click', async () => {
+            if(deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if(outcome === 'accepted') {
+                    document.getElementById('install-banner').style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
         window.onload = () => {
-            const last = localStorage.getItem('last_v14');
+            const last = localStorage.getItem('last_v15');
             if(last) {
-                const saved = localStorage.getItem(`repton_v14_${last}`);
+                const saved = localStorage.getItem(`repton_v15_${last}`);
                 if(saved) { userData = JSON.parse(saved); handleLogin(); }
             }
         }
